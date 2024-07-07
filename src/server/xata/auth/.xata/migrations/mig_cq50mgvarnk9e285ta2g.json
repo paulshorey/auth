@@ -1,0 +1,30 @@
+{
+  "done": true,
+  "migration": {
+    "name": "mig_cq50mgvarnk9e285ta2g",
+    "operations": [
+      {
+        "add_column": {
+          "table": "users",
+          "column": {
+            "pk": false,
+            "name": "name_last",
+            "type": "text",
+            "check": {
+              "name": "users_xata_string_length_name_last",
+              "constraint": "LENGTH(\"name_last\") <= 2048"
+            },
+            "unique": false,
+            "comment": "{\"xata.type\":\"string\"}",
+            "nullable": true
+          }
+        }
+      }
+    ]
+  },
+  "migrationType": "pgroll",
+  "name": "mig_cq50mgvarnk9e285ta2g",
+  "parent": "mig_cq50mefarnk9e285ta1g",
+  "schema": "public",
+  "startedAt": "2024-07-07T03:28:04.243583Z"
+}

@@ -1,0 +1,25 @@
+{
+  "done": true,
+  "migration": {
+    "name": "mig_cq50mo28jjefqltkg9i0",
+    "operations": [
+      {
+        "add_column": {
+          "table": "users",
+          "column": {
+            "pk": false,
+            "name": "phone_number",
+            "type": "bigint",
+            "unique": false,
+            "nullable": true
+          }
+        }
+      }
+    ]
+  },
+  "migrationType": "pgroll",
+  "name": "mig_cq50mo28jjefqltkg9i0",
+  "parent": "mig_cq50mgvarnk9e285ta2g",
+  "schema": "public",
+  "startedAt": "2024-07-07T03:28:33.41653Z"
+}

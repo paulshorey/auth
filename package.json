@@ -1,0 +1,29 @@
+{
+  "name": "next",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@stytch/nextjs": "^20.1.0",
+    "@stytch/react": "^18.1.0",
+    "@stytch/vanilla-js": "^4.13.1",
+    "@xata.io/client": "^0.29.5",
+    "next": "14.2.4",
+    "react": "^18",
+    "react-dom": "^18",
+    "sass": "^1.77.6"
+  },
+  "devDependencies": {
+    "typescript": "^5",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.4"
+  }
+}
