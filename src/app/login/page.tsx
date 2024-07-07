@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
-const Auth = dynamic(() => import("@/client/pages/Auth"), { ssr: false });
+const Login = dynamic(() => import("@/client/pages/Login"), { ssr: false });
 
 export default function ServerHome() {
-  return <Auth />;
+  return <Login />;
 }

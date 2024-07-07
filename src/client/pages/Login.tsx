@@ -8,26 +8,29 @@ type Props = {
   data?: unknown;
 };
 
-export default function Auth({ error, data }: Props) {
+export default function Login({ error, data }: Props) {
   const protocol = window.location.protocol;
   const hostname = window.location.hostname;
   const port = window.location.port;
   const client = `${protocol}//${hostname}${port ? `:${port}` : ""}`;
   const config: StytchLoginConfig = {
-    products: ["oauth", "emailMagicLinks"],
+    products: ["oauth"],
     oauthOptions: {
       providers: [
         {
           type: "google",
         },
+        // {
+        //   type: "github",
+        // },
       ],
-      loginRedirectURL: client + "/login/oauth_callback",
-      signupRedirectURL: client + "/login/oauth_callback",
+      loginRedirectURL: client + "/account",
+      signupRedirectURL: client + "/account",
     },
     emailMagicLinksOptions: {
-      loginRedirectURL: client + "/login/oauth_callback",
+      loginRedirectURL: client + "/account",
       loginExpirationMinutes: 30,
-      signupRedirectURL: client + "/login/oauth_callback",
+      signupRedirectURL: client + "/account",
       signupExpirationMinutes: 30,
     },
   };
@@ -74,7 +77,6 @@ export default function Auth({ error, data }: Props) {
 
   return (
     <Layout1>
-      <h1>Auth page:</h1>
       {!!error && <div>{JSON.stringify(error, null, " ")}</div>}
       {!!data && (
         <pre>
@@ -82,6 +84,31 @@ export default function Auth({ error, data }: Props) {
         </pre>
       )}
       <StytchLogin config={config} styles={styles} />
+      <style>{`
+        a[href*="https://stytch.com"] {
+          display: none !important;
+        }
+        button#oauth-google {
+          border-bottom: solid 2px #666; padding-bottom: 2px;
+        }
+        input {
+          border-color: #ccc !important;
+        }
+        div[size="header"] {
+          display:none;
+        }
+        .oauth-buttons + div * {
+          color: #333 !important;
+          border-color: #ccc !important;
+        }
+        stytch-ui > div > section > span > div {
+          box-shadow: 1px 2px 0 0 #ccc;
+          border-color: #ccc !important;
+        }
+        stytch-ui > div > section > span > div > div:last-child:not(:first-child) {
+          display: none !important;
+        }
+      `}</style>
     </Layout1>
   );
 }

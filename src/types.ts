@@ -1,27 +1,32 @@
 export type Session = {
-  expires: number;
-  user: Record<string, any>;
-  session: Record<string, any>;
+  user: UserAccount;
+  expires_at: string;
+  expires_on: number;
 };
-export function isSession(data: any): data is Session {
-  return data.expires && data.user && data.session;
+export function isSession(session: any): session is Session {
+  return session.user?.stytch_id && session.expires_at;
 }
 
 export type StytchTokenType = "magic_links" | "oauth";
 
-export type user = {
+export type SessionData = Record<string, any>;
+
+export type UserAccount = {
+  stytch_id: string;
+  provider: string;
   email: string;
-  name_first: string;
-  name_last: string;
-  phone_number: string;
+  name_first?: string;
+  name_last?: string;
+  phone_number?: string;
 };
+// & (UserPasswordValidated | user_google_validated);
 
-export type user_password = {
-  password: string;
-  google_id: undefined;
-} & user;
+// type UserPasswordValidated = {
+//   password: string;
+//   google_id: undefined;
+// };
 
-export type user_google = {
-  google_id: string;
-  password: undefined;
-} & user;
+// type user_google_validated = {
+//   google_id: string;
+//   password: undefined;
+// };

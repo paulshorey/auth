@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
-const _404 = dynamic(() => import("@/client/pages/_404"), { ssr: false });
+const Error = dynamic(() => import("@/client/pages/Error"), { ssr: false });
 
 export default function ServerNotFound() {
-  return <_404 />;
+  return <Error title="Page Not Found" />;
 }
