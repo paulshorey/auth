@@ -1,8 +1,8 @@
 "use client"; // error MUST BE a client component
 
 import dynamic from "next/dynamic";
-const DebugData = dynamic(() => import("@/client/pages/Account"), { ssr: false });
+const Error = dynamic(() => import("@/client/pages/Error"), { ssr: false });
 
 export default function ServerError({ error }: { error: any }) {
-  return <DebugData data={error} />;
+  return <Error data={error} />;
 }

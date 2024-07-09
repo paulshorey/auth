@@ -1,0 +1,20 @@
+{
+  "done": true,
+  "migration": {
+    "name": "mig_cq5emfa8jjefqltkghi0",
+    "operations": [
+      {
+        "drop_column": {
+          "down": "''",
+          "table": "users",
+          "column": "google_id"
+        }
+      }
+    ]
+  },
+  "migrationType": "pgroll",
+  "name": "mig_cq5emfa8jjefqltkghi0",
+  "parent": "mig_cq5emdnarnk9e285tkbg",
+  "schema": "public",
+  "startedAt": "2024-07-07T19:23:42.271859Z"
+}

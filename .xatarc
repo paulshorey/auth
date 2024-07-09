@@ -1,6 +1,6 @@
 {
   "databaseURL": "https://Paul-Shorey-s-workspace-6s4u10.us-east-1.xata.sh/db/auth",
   "codegen": {
-    "output": "src/server/xata/auth/xata.ts"
+    "output": "src/server/data/account/xata.ts"
   }
 }

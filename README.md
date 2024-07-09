@@ -1,60 +1,69 @@
 # Hello 👋
 
-This is an example React app - showing how easy it can be to get started.
+This is an example React app with authentication and state management - showing how easy it can be to maintain a React NextJS app.
 
 <br />
 
 ## Goals
 
-1. Keep it simple, stupid. If you over-engineer your app, then you actually will feel stupid.
-2. Seriously, keep it simple. Minimize dependencies.
-
-- Do you need that CSS framework? Maybe. But first try to use the simpler smaller "css modules" approach.
-- Do you need to import a debounce function from a 3rd party library? No. It's just a few lines of code.
-
-3. So, this app tries to be very easy to maintain by making everything **modular**:
+1. Keep it simple! Minimize dependencies. Add a local function instead of installing a 3rd party module.
+2. Everything explicitly organized. An intern or AI should be able to understand where everything belongs.
+3. Separation of client/server (React state / API calls), styling/logic (CSS vs HTML), public/private (NEXT_PUBLIC vs API KEYS).
+4. Extensible structure that will not need to change for future features. Refactoring is very expensive (must rewrite many unit tests).
 
 <br />
 
-# Atomic
+## NextJS
 
-## **`ui`** folder
+- `app` - NextJS app directory (server only).
+  Only `error.tsx` page is "use client", all others should "use server" whenever possible.
+  Best to keep server/client separate by importing client components with `dynamic()` + `ssr: false`.
 
-Is used as a local "UI Library", specific to the needs/branding of this app. If any of these become generic, able to be used for multiple apps, they can be separated out to their own external library. But that adds a lot of maintenance/testing/versioning, so best to keep it local.
+  ```
+  const Home = dynamic(() => import("@/client/pages/Home"), { ssr: false });
+  ```
 
-Inspired by "Atomic Design" principles. UI components should behave like "atoms"/"molecules" (not "organisms"/"templates"). Group each set of components into a folder, so the `ui` folder does not grow into a huge long list. Inside each folder, the `index.tsx` file should serve as the "molecule", import multiple smaller "atom" components from the folder. Each "atom" component should be able to be imported and used individually also. Atoms should not rely on anything.
-
-Local UI components should support these values:
-
-<br />
-
-#### Pure functions
-
-Used as "pure functions". Do not interact with state or actions outside themselves.
-Let's not get into mocking/spying hell when unit testing. Each component should be a simple input/output.
-Logic, data fetching, and reference to the runtime environment should be kept in the parent.
+  App directory should not have any reusable code/logic/data/styles. Import only from `src`.
 
 <br />
 
-#### Composable
+## Library
 
-Accept all valid HTML attributes passed to them from the parent. Like this:
+- `src/server` - logic/state/views that should run in the server only (static read-only Components).
+- `src/client` - logic/state/views that should run in the browser only (interactive or stateful Components).
+- `src/common` - universal/fullstack - logic/data/helpers that will function equally well in both browser and server.
 
-```
-export default function Header(props: React.HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div {...props} data-component="Header">
-      ...
-    </div>
-  )
-}
-```
+When importing, use `@` to refer to `src`
 
 <br />
 
-#### Customizable, but Concise
+## Session state/data
 
-Pass options/flags as props to modify some internal functionality of the component.
-But if an option changes a lot of the functionality, makes it more difficult to maintain, then it's better to create a new component for the new functionality.
+Session is created and expired in [Stytch.com](https://stytch.com). They provide a client-side login form and event callbacks, and server-side API endpoints to authenticate and verify the current session. Stytch returns user data and session. This makes login/signup very easy.
+
+Stytch session only contains the email/phone/social-provider-id/password of the most recent login. No other user data. No preferences. No application data. So, this is only useful for login/signup. It is not used for application state.
+
+### Account state/data
+
+User's address, payment, preferences, and alternative/preferred contact info, tokens remaining, and application data relevant to the user is all stored in [Xata.io](https://xata.io) `users` database.
+
+When someone logs in with Stytch, the app saves their user data to our Xata database. User is then also able to add/edit additional data.
+
+### Sync credentials
+
+Stytch returns the `email` and `phone` from whatever verification method was used (email confirmation, phone OTP, or social provider). This data is saved to `account` database and can NOT be edited by the user.
+
+Stytch is **"sometimes"** able to sync email/phone credentials. See ["Note:" in their update-user docs](https://stytch.com/docs/api/update-user). Unfortunately, if someone logs in with the new credentials, they will have 2 different Stytch accounts, one for each credential. These Stytch accounts will NOT be able to be merged. So, this method should not be relied on.
+
+Instead, we must ignore Stytch's update functionality, and simply use Stytch as a way to validate email/phone. Because of this limitation, their $250/month fee is not worth it. So, we'll need a better process to validate email/phone. The goal is to transition away from Stytch ASAP.
+
+However, for now, Stytch's system of redirects is valuable and saves a lot of time.
+
+### Edit phone/email
+
+1. User enters a new phone/email
+2. UI is updated to show a confirmation "Enter OTP code" to validate phone/email
+3. App generates a random 6-digit number. Send it to the API that sends an OTP code to the phone/email
+4. User types OTP code into the confirmation form. If successful, account is updated.
 
 <br />

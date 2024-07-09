@@ -4,7 +4,7 @@ import Header from "../ui/Header";
 import Providers from "./Providers";
 import styles from "./Layout1.module.scss";
 
-export default function LayoutSimple({
+export function Layout1({
   children,
 }: Readonly<{
   children: React.ReactNode;

@@ -1,19 +1,27 @@
 "use client";
 
-import Layout1 from "@/client/wrappers/Layout1";
+import { Layout1 } from "@/client/wrappers/Layout1";
+import { usePathname } from "next/navigation";
+import { useSessionStore } from "@/client/data/session/useSessionStore";
 
 type Props = {
   title?: string | React.ReactNode;
   data?: any;
 };
 
-export default function Error({ title, data }: Props) {
+export default function ErrorPage({ title, data }: Props) {
+  useSessionStore();
+  const pathname = usePathname();
   const urlParams = new URLSearchParams(window.location.search);
   const urlData = urlParams.entries();
   const urlDataArray = urlData ? [...urlData] : [];
   return (
     <Layout1>
       <h1>{title ?? "Error:"}</h1>
+      <h3>{pathname}</h3>
+      <p>
+        <a href="/">👈 back to homepage</a>
+      </p>
       {!!data && (
         <pre style={{ textAlign: "left", maxWidth: "100dvw" }}>
           <code>{JSON.stringify(data, null, " ")}</code>

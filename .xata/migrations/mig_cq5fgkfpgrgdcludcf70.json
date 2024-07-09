@@ -1,0 +1,30 @@
+{
+  "done": true,
+  "migration": {
+    "name": "mig_cq5fgkfpgrgdcludcf70",
+    "operations": [
+      {
+        "add_column": {
+          "table": "users",
+          "column": {
+            "pk": false,
+            "name": "provider",
+            "type": "text",
+            "check": {
+              "name": "users_xata_string_length_provider",
+              "constraint": "LENGTH(\"provider\") <= 2048"
+            },
+            "unique": false,
+            "comment": "{\"xata.type\":\"string\"}",
+            "nullable": true
+          }
+        }
+      }
+    ]
+  },
+  "migrationType": "pgroll",
+  "name": "mig_cq5fgkfpgrgdcludcf70",
+  "parent": "mig_cq5emfa8jjefqltkghi0",
+  "schema": "public",
+  "startedAt": "2024-07-07T20:19:30.149424Z"
+}

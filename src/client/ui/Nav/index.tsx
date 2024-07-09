@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "../Link";
 
 export default function Nav(props: React.HTMLAttributes<HTMLDivElement>) {
   return (
@@ -10,6 +10,9 @@ export default function Nav(props: React.HTMLAttributes<HTMLDivElement>) {
           </li>
           <li>
             <Link href="/login">Login</Link>
+          </li>
+          <li>
+            <Link href="/account">Account</Link>
           </li>
         </ul>
       </nav>
