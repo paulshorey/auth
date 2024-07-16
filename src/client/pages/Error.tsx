@@ -1,8 +1,7 @@
 "use client";
 
-import { Layout1 } from "@/client/wrappers/Layout1";
+import { Layout1 } from "@/client/ui/templates/Layout1";
 import { usePathname } from "next/navigation";
-import { useSessionStore } from "@/client/data/session/useSessionStore";
 
 type Props = {
   title?: string | React.ReactNode;
@@ -10,7 +9,6 @@ type Props = {
 };
 
 export default function ErrorPage({ title, data }: Props) {
-  useSessionStore();
   const pathname = usePathname();
   const urlParams = new URLSearchParams(window.location.search);
   const urlData = urlParams.entries();

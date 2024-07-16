@@ -1,46 +1,57 @@
 import { create } from "zustand";
-import { session_default, session_state, is_session_valid, session_type } from "@/common/data/session/types";
+import { sessionDefault, SessionState, isSessionValid, SessionType } from "@/common/data/session/types";
 import { persist } from "zustand/middleware";
-import { useAccountStore } from "@/client/data/account/useAccountStore";
-import { is_account_valid } from "../../../common/data/account/types";
 // import { devtools } from "zustand/middleware";
 
-export type SessionStore = session_state & {
-  useSetSession: () => (state: session_state) => void;
+/**
+ * "state" = just the data, serializable, can persist in localStorage if we want
+ * "store" = state + plus methods that modify the state
+ */
+export type SessionStore = SessionState & {
+  setState: (state: SessionState) => void;
+  getState: () => SessionState;
+  setSession: (state: { session: SessionState["session"]; session_error?: SessionState["session_error"] }) => Promise<void>;
+  useSetSession: (session: SessionType) => void;
 };
 
-const sessionState = (set: (state: Partial<session_state>) => void, get: () => SessionStore) => {
+const sessionCreate = (set: (state: Partial<SessionState>) => void, get: () => SessionState) => {
   return {
-    session: session_default,
+    setState: (state: SessionState) => {
+      set(state);
+    },
+    getState: () => get(),
+    setSession: async ({ session, session_error }) => {
+      const session_valid = isSessionValid(session);
+      if (session_valid && !session_error) {
+        session_error = { name: "Error", message: "Session invalid", stack: "useSessionStore.setSession()" };
+      }
+      set({ session: session, session_error, session_valid });
+    },
+    session: sessionDefault,
     session_valid: false,
     session_error: undefined,
-    useSetSession: () => {
-      const [account, setAccount] = useAccountStore((state) => [state.account, state.setAccount]);
-      return async function ({ session, session_error }) {
-        // update session state
-        set({ session, session_error, session_valid: is_session_valid(session) });
-        // update account state
-        if (is_session_valid(session)) {
-          // && !is_account_valid(account)) {
-          // const user = {
-          //   ...session.user,
-          //   "preferences_ui.dark_mode": true,
-          // };
-          const accountState = await (
-            await fetch("/api/account", {
-              method: "POST",
-              body: JSON.stringify(session.user),
-            })
-          ).json();
-          setAccount(accountState);
-        }
-      };
-    },
   } as SessionStore;
 };
-// export const sessionStore = create<SessionStore>(sessionState);
-export const useSessionStore = create(
-  persist<SessionStore>(sessionState, {
-    name: new Date().getDay().toString() + new Date().getMonth().toString() + "26ws2sss21",
+
+type Filter = (arg0: SessionState) => any;
+const ENABLE_PERSIST_STATE = false;
+export const useSessionStore: (filter?: Filter) => SessionStore = create(
+  // persist state in localStorage
+  persist<SessionStore>(sessionCreate, {
+    // IN DEVELOPMENT, UNCOMMENT Math.random() to bypass localStorage
+    name: ENABLE_PERSIST_STATE ? "1" : Math.random().toString(),
   })
 );
+
+// export const useAccountStore = () => {
+//   const store = createStore((state) => state);
+//   const account = store.account;
+//   useEffect(() => {
+//     // @ts-ignore
+//     window.accountStore = store;
+//     // @ts-ignore
+//     console.log("accountStore", window.accountStore);
+//     // eslint-disable-next-line react-hooks/exhaustive-deps
+//   }, [account]);
+//   return store;
+// };

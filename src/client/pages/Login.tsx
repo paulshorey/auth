@@ -1,8 +1,8 @@
 "use client";
-import { Layout1 } from "@/client/wrappers/Layout1";
-import { LoginForm } from "@/client/ui/form/Login";
-import { session_state_from_stytch_data } from "@/server/data/session";
-import { is_session_valid } from "@/common/data/session/types";
+import { Layout1 } from "@/client/ui/templates/Layout1";
+import { LoginForm } from "@/client/ui/organisms/forms/Login";
+import { SessionState_from_stytch_data } from "@/server/data/session";
+import { isSessionValid } from "@/common/data/session/types";
 import { useSessionStore } from "@/client/data/session/useSessionStore";
 
 type Props = {
@@ -11,12 +11,11 @@ type Props = {
 };
 
 export default function LoginPage({ error, data }: Props) {
-  const useSetSession = useSessionStore((store) => store.useSetSession);
-  const setSession = useSetSession();
+  const { setSession } = useSessionStore((state) => state.session);
 
   const validatePhone = (event: any) => {
-    const sessionState = session_state_from_stytch_data(event.data, "otp");
-    if (is_session_valid(sessionState?.session)) {
+    const sessionState = SessionState_from_stytch_data(event.data, "otp");
+    if (isSessionValid(sessionState?.session)) {
       setSession(sessionState);
       window.location.href = "/account";
     }

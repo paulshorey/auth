@@ -1,4 +1,4 @@
-import Link from "../Link";
+import Link from "@/client/ui/atoms/Link";
 
 export default function Nav(props: React.HTMLAttributes<HTMLDivElement>) {
   return (

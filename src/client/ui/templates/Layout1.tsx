@@ -1,7 +1,7 @@
 "use client";
-import Footer from "../ui/Footer";
-import Header from "../ui/Header";
-import Providers from "./Providers";
+import Footer from "@/client/ui/molecules/Footer";
+import Header from "@/client/ui/molecules/Header";
+import Providers from "@/client/ui/templates/Providers";
 import styles from "./Layout1.module.scss";
 
 export function Layout1({

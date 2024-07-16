@@ -1,12 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Layout1 } from "@/client/wrappers/Layout1";
-import { useSessionStore } from "@/client/data/session/useSessionStore";
+import { Layout1 } from "@/client/ui/templates/Layout1";
 
 export default function HomePage() {
   const [count, setCount] = useState(0);
-  useSessionStore();
   return (
     <Layout1>
       <h1>Home page:</h1>

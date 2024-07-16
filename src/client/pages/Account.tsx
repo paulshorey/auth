@@ -1,54 +1,42 @@
 "use client";
 
-import { Layout1 } from "@/client/wrappers/Layout1";
-import { session_state } from "@/common/data/session/types";
-import { useSessionStore } from "@/client/data/session/useSessionStore";
-import { useEffect } from "react";
-import { useAccountStore } from "@/client/data/account/useAccountStore";
-import { account_state } from "@/common/data/account/types";
+import { Layout1 } from "@/client/ui/templates/Layout1";
+import { SessionState, StytchTokenType } from "@/common/data/session/types";
+import { AccountState } from "@/common/data/account/types";
+import { useSession } from "@/client/data/session/useSession";
+import { useAccount } from "../data/account/useAccount";
 
 type Props = {
-  sessionState?: session_state;
-  accountState?: account_state;
+  token?: string;
+  stytch_token_type?: StytchTokenType;
+  sessionState?: SessionState;
+  accountState?: AccountState;
 };
 
-function throttle<F extends (...args: any[]) => any>(fn: F, ms: number = 1000): (...args: Parameters<F>) => void {
-  let lastCallTime = 0;
+// function throttle<F extends (...args: any[]) => any>(fn: F, ms: number = 1000): (...args: Parameters<F>) => void {
+//   let lastCallTime = 0;
+//   return (...args: Parameters<F>): void => {
+//     const now = Date.now();
+//     if (now - lastCallTime > ms) {
+//       fn(...args);
+//       lastCallTime = now;
+//     }
+//   };
+// }
 
-  return (...args: Parameters<F>): void => {
-    const now = Date.now();
-    if (now - lastCallTime > ms) {
-      fn(...args);
-      lastCallTime = now;
-    }
-  };
-}
-
-export default function AccountPage({ sessionState }: Props) {
-  const { account, account_error } = useAccountStore();
-  const { session, session_valid, session_error, useSetSession } = useSessionStore();
-  const setSession = useSetSession();
-
-  // On component mount, set state from server
-  useEffect(
-    throttle(() => {
-      if (session_valid) {
-        setSession({ session });
-      } else {
-        sessionState && setSession(sessionState);
-      }
-    }),
-    []
-  );
+export default function AccountPage({ token = "", stytch_token_type = "" }: Props) {
+  const sessionState = useSession(token, stytch_token_type);
+  const accountState = useAccount();
 
   return (
     <Layout1>
-      <h1>Account page:</h1>
+      <h1>Session:</h1>
       <pre style={{ textAlign: "left", maxWidth: "100dvw" }}>
-        <code>{JSON.stringify({ session, session_error }, null, " ")}</code>
+        <code>{JSON.stringify(sessionState, null, " ")}</code>
       </pre>
+      <h1>Account:</h1>
       <pre style={{ textAlign: "left", maxWidth: "100dvw" }}>
-        <code>{JSON.stringify({ account, account_error }, null, " ")}</code>
+        <code>{JSON.stringify(accountState, null, " ")}</code>
       </pre>
     </Layout1>
   );
