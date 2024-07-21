@@ -1,7 +1,26 @@
 "use client";
 import { Layout1 } from "@/client/ui/templates/Layout1";
 import { LoginForm } from "@/client/ui/organisms/forms/Login";
-import { encodeJWT } from "@/common/data/encodeDecode";
+
+function redirectWithPut(url: string, data: Record<string, any>) {
+  // Create form
+  let form = document.createElement("form");
+  form.method = "PUT";
+  form.action = url;
+
+  // Create hidden input elements for each data item
+  Object.keys(data).forEach(function (key) {
+    let input = document.createElement("input");
+    input.type = "hidden";
+    input.name = key;
+    input.value = data[key];
+    form.appendChild(input);
+  });
+
+  // Append form to body and submit
+  document.body.appendChild(form);
+  form.submit();
+}
 
 type Props = {
   error?: Error;
@@ -16,9 +35,7 @@ export default function LoginPage({ error, data }: Props) {
   const validatePhone = async (event: any) => {
     if (event.type === "OTP_AUTHENTICATE") {
       console.log("otp event.data", event.data);
-      const otpEventJWT = encodeJWT(event.data);
-      // window.location.href = "/account?otpEventJWT=" + encodeURIComponent(otpEventJWT);
-      console.log('"/account?otpEventJWT=" + encodeURIComponent(otpEventJWT)', "/account?otpEventJWT=" + encodeURIComponent(otpEventJWT));
+      redirectWithPut("/account", { otpEventDataJSON: JSON.stringify(event.data) });
     }
   };
 
