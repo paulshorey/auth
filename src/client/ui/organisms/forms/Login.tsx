@@ -1,11 +1,8 @@
 import { StytchLogin } from "@stytch/react";
 import { StytchLoginConfig } from "@stytch/core/dist/public";
+import { encodeJWT } from "@/common/data/encodeDecode";
 
-type Props = {
-  onEvent: (event: any) => void;
-};
-
-export function LoginForm({ onEvent }: Props) {
+export function LoginForm() {
   const protocol = window.location.protocol;
   const hostname = window.location.hostname;
   const port = window.location.port;
@@ -25,13 +22,13 @@ export function LoginForm({ onEvent }: Props) {
           type: "github",
         },
       ],
-      loginRedirectURL: client + "/account",
-      signupRedirectURL: client + "/account",
+      loginRedirectURL: client + "/account/oauth",
+      signupRedirectURL: client + "/account/oauth",
     },
     emailMagicLinksOptions: {
-      loginRedirectURL: client + "/account",
+      loginRedirectURL: client + "/account/oauth",
       loginExpirationMinutes: 30,
-      signupRedirectURL: client + "/account",
+      signupRedirectURL: client + "/account/oauth",
       signupExpirationMinutes: 30,
     },
   };
@@ -76,9 +73,20 @@ export function LoginForm({ onEvent }: Props) {
     },
   };
 
+  /**
+   * OTP code from email/phone can only be handled on the client side.
+   * But for consistency and security, we fetch session/account data only on the server.
+   */
+  const validatePhone = async (event: any) => {
+    if (event.type === "OTP_AUTHENTICATE") {
+      const otpEventJWT = encodeJWT(event.data);
+      window.location.href = "/account/otp?data=" + encodeURIComponent(otpEventJWT);
+    }
+  };
+
   return (
     <>
-      <StytchLogin config={config} styles={styles} callbacks={{ onEvent }} />
+      <StytchLogin config={config} styles={styles} callbacks={{ onEvent: validatePhone }} />
       <style>{`
         a[href*="https://stytch.com"] {
           display: none !important;

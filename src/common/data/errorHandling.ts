@@ -15,11 +15,11 @@ export const handleStateError = (state: AccountState | SessionState) => {
 };
 
 export const redirectNextjs = (redirectUrl: string) => {
-  if (typeof window === "undefined") {
-    redirect(redirectUrl);
+  if (typeof window === "object") {
+    // client
+    window.location.href = redirectUrl;
   } else {
-    // nextjs client-side redirect
-    const router = require("next/router");
-    router.default.push(redirectUrl);
+    // server
+    redirect(redirectUrl);
   }
 };

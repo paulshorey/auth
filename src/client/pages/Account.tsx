@@ -1,34 +1,12 @@
 "use client";
 
 import { Layout1 } from "@/client/ui/templates/Layout1";
-import { SessionState, StytchTokenType } from "@/common/data/session/types";
 import { useSessionStore } from "@/client/data/session/useSessionStore";
 import { useAccountStore } from "../data/account/useAccountStore";
-import { AccountState } from "../../common/data/account/types";
-import { useEffect } from "react";
 
-type Props = {
-  accountState?: AccountState;
-  sessionState?: SessionState;
-  token?: string;
-  stytch_token_type?: StytchTokenType;
-};
-
-export default function AccountPage({ sessionState: sessionStateFromServer, accountState: accountStateFromServer }: Props) {
+export default function AccountPage() {
   const sessionState = useSessionStore();
   const accountState = useAccountStore();
-
-  useEffect(() => {
-    if (sessionStateFromServer) {
-      sessionState.setState(sessionStateFromServer);
-    }
-  }, [sessionStateFromServer]);
-
-  useEffect(() => {
-    if (accountStateFromServer) {
-      accountState.setState(accountStateFromServer);
-    }
-  }, [accountStateFromServer]);
 
   return (
     <Layout1>

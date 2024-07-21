@@ -37,12 +37,11 @@ const accountCreate = (set: (options: Partial<AccountState>) => void, get: () =>
 
 // export const useAccountStore = create<AccountStore>(accountState);
 type Filter = (arg0: AccountState) => any;
-const ENABLE_PERSIST_STATE = false;
+const ENABLE_PERSIST_STATE = true;
 export const useAccountStore: (filter?: Filter) => AccountStore = create(
   // persist state in localStorage
   persist<AccountStore>(accountCreate, {
-    // IN DEVELOPMENT, UNCOMMENT Math.random() to bypass localStorage
-    name: ENABLE_PERSIST_STATE ? "1" : Math.random().toString(),
+    name: ENABLE_PERSIST_STATE ? "account/1" : Math.random().toString(),
   })
 );
 

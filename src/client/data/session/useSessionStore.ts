@@ -32,12 +32,11 @@ const sessionCreate = (set: (state: Partial<SessionState>) => void, get: () => S
 };
 
 type Filter = (arg0: SessionState) => any;
-const ENABLE_PERSIST_STATE = false;
+const ENABLE_PERSIST_STATE = true;
 export const useSessionStore: (filter?: Filter) => SessionStore = create(
   // persist state in localStorage
   persist<SessionStore>(sessionCreate, {
-    // IN DEVELOPMENT, UNCOMMENT Math.random() to bypass localStorage
-    name: ENABLE_PERSIST_STATE ? "1" : Math.random().toString(),
+    name: ENABLE_PERSIST_STATE ? "session/1" : Math.random().toString(),
   })
 );
 
