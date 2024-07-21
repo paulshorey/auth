@@ -1,8 +1,7 @@
 "use client";
 import { Layout1 } from "@/client/ui/templates/Layout1";
 import { LoginForm } from "@/client/ui/organisms/forms/Login";
-import jwt from "jsonwebtoken";
-const JWT_SECRET_KEY = process.env.NEXT_PUBLIC_JWT_SECRET_KEY || "";
+import { encodeJWT } from "@/common/data/encodeDecode";
 
 type Props = {
   error?: Error;
@@ -16,8 +15,10 @@ export default function LoginPage({ error, data }: Props) {
    */
   const validatePhone = async (event: any) => {
     if (event.type === "OTP_AUTHENTICATE") {
-      const otpEventJWT = jwt.sign(event.data, JWT_SECRET_KEY);
-      window.location.href = "/account?otpEventJWT=" + encodeURIComponent(otpEventJWT);
+      console.log("otp event.data", event.data);
+      const otpEventJWT = encodeJWT(event.data);
+      // window.location.href = "/account?otpEventJWT=" + encodeURIComponent(otpEventJWT);
+      console.log('"/account?otpEventJWT=" + encodeURIComponent(otpEventJWT)', "/account?otpEventJWT=" + encodeURIComponent(otpEventJWT));
     }
   };
 
