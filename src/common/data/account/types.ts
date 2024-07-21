@@ -10,8 +10,8 @@ export const accountDefault = {
 };
 export const accountStateDefault: AccountState = {
   account: accountDefault,
-  account_invalid: true,
-  account_error: undefined,
+  invalid: true,
+  error: undefined,
 };
 
 export type AccountType = {
@@ -23,7 +23,7 @@ export type AccountType = {
 };
 
 export type AccountState = {
-  account: AccountType;
-  account_invalid?: boolean;
-  account_error?: ErrorWithResponseCode;
+  account?: AccountType;
+  invalid?: boolean;
+  error?: ErrorWithResponseCode;
 };

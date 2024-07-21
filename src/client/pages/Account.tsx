@@ -2,31 +2,33 @@
 
 import { Layout1 } from "@/client/ui/templates/Layout1";
 import { SessionState, StytchTokenType } from "@/common/data/session/types";
-import { AccountState } from "@/common/data/account/types";
-import { useSession } from "@/client/data/session/useSession";
-import { useAccount } from "../data/account/useAccount";
+import { useSessionStore } from "@/client/data/session/useSessionStore";
+import { useAccountStore } from "../data/account/useAccountStore";
+import { AccountState } from "../../common/data/account/types";
+import { useEffect } from "react";
 
 type Props = {
+  accountState?: AccountState;
+  sessionState?: SessionState;
   token?: string;
   stytch_token_type?: StytchTokenType;
-  sessionState?: SessionState;
-  accountState?: AccountState;
 };
 
-// function throttle<F extends (...args: any[]) => any>(fn: F, ms: number = 1000): (...args: Parameters<F>) => void {
-//   let lastCallTime = 0;
-//   return (...args: Parameters<F>): void => {
-//     const now = Date.now();
-//     if (now - lastCallTime > ms) {
-//       fn(...args);
-//       lastCallTime = now;
-//     }
-//   };
-// }
+export default function AccountPage({ sessionState: sessionStateFromServer, accountState: accountStateFromServer }: Props) {
+  const sessionState = useSessionStore();
+  const accountState = useAccountStore();
 
-export default function AccountPage({ token = "", stytch_token_type = "" }: Props) {
-  const sessionState = useSession(token, stytch_token_type);
-  const accountState = useAccount();
+  useEffect(() => {
+    if (sessionStateFromServer) {
+      sessionState.setState(sessionStateFromServer);
+    }
+  }, [sessionStateFromServer]);
+
+  useEffect(() => {
+    if (accountStateFromServer) {
+      accountState.setState(accountStateFromServer);
+    }
+  }, [accountStateFromServer]);
 
   return (
     <Layout1>

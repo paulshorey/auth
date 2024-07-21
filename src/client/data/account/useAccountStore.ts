@@ -1,35 +1,36 @@
 import { create } from "zustand";
 import { accountDefault, isAccountValid, AccountState, AccountType } from "@/common/data/account/types";
 import { persist } from "zustand/middleware";
-import { SessionState } from "@/common/data/session/types";
-import { SessionStore } from "@/client/data/session/useSessionStore";
 // import { devtools } from "zustand/middleware";
 
 export type AccountStore = AccountState & {
-  setAccount: (state: { account: AccountState["account"]; account_error?: AccountState["account_error"] }) => Promise<void>;
+  setState: (state: AccountState) => Promise<void>;
   resetAccount: () => void;
 };
 
 const accountCreate = (set: (options: Partial<AccountState>) => void, get: () => AccountStore) => {
   return {
     account: accountDefault,
-    account_invalid: false,
-    account_error: undefined,
-    setAccount: async ({ account, account_error }) => {
-      const account_invalid = !isAccountValid(account);
-      if (account_invalid && !account_error) {
-        account_error = { name: "Error", message: "Account invalid", stack: "useAccountStore.setAccount()" };
+    invalid: true,
+    error: undefined,
+    setState: async (state: AccountState) => {
+      const invalid = !isAccountValid(state.account);
+      if (invalid && !state.error) {
+        state.error = { name: "500", message: "Account invalid", stack: "useAccountStore.setAccount()" };
       }
-      set({ account: mergeAccounts(account, get().account), account_error, account_invalid });
-      if (account_invalid) {
-        await fetch("/api/account", {
+      const oldAccount = get().account;
+      if (state.account) {
+        set({ account: mergeAccounts(state.account, oldAccount || {}), error: state.error, invalid });
+      }
+      if (invalid) {
+        fetch("/api/account", {
           method: "POST",
-          body: JSON.stringify(account),
-        }).then((res) => res.json());
+          body: JSON.stringify(state.account),
+        });
       }
     },
     resetAccount: () => {
-      set({ account: accountDefault, account_invalid: false, account_error: undefined });
+      set({ account: accountDefault, invalid: false, error: undefined });
     },
   } as AccountStore;
 };

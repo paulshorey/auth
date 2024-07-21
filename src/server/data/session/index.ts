@@ -10,8 +10,9 @@ export async function session_from_stytch_token({ token, stytch_token_type }: Pr
   console.log("session_from_stytch_token", { token, stytch_token_type });
   if (!token || !stytch_token_type) {
     return {
-      session: {},
-      session_error: {
+      session: undefined,
+      invalid: true,
+      error: {
         name: "400",
         message: "Token expired. Please try again.",
         stack: "!token || !stytch_token_type \n" + JSON.stringify({ token, stytch_token_type }),
@@ -40,8 +41,9 @@ export async function session_from_stytch_token({ token, stytch_token_type }: Pr
 
     if (!stytchResponse.ok) {
       return {
-        session: {},
-        session_error: {
+        session: undefined,
+        invalid: true,
+        error: {
           name: "400",
           message: "Server took too long to respond. Please try again.",
           stack: "!stytchResponse.ok \n" + JSON.stringify(convertErrorOrResponseToObject(stytchResponse)),
@@ -55,8 +57,9 @@ export async function session_from_stytch_token({ token, stytch_token_type }: Pr
   } catch (error) {
     console.log("session_from_stytch_token catch", { token, stytch_token_type });
     return {
-      session: {},
-      session_error: {
+      session: undefined,
+      invalid: true,
+      error: {
         name: "400",
         message: "Authentication error. Please try again.",
         stack: "session_from_stytch_token catch error \n" + JSON.stringify({ token, stytch_token_type }),
@@ -108,8 +111,9 @@ export function SessionState_from_stytch_data(data: Record<string, any>, stytch_
     // error
   } catch (error) {
     return {
-      session: {},
-      session_error: {
+      session: undefined,
+      invalid: true,
+      error: {
         name: "400",
         message: "Authentication error. Please try again.",
         stack: "SessionState_from_stytch_data catch \n" + JSON.stringify(error),
@@ -123,8 +127,9 @@ export function SessionState_from_stytch_data(data: Record<string, any>, stytch_
       return { session };
     } else {
       return {
-        session: {},
-        session_error: {
+        session: undefined,
+        invalid: true,
+        error: {
           name: "400",
           message: "Session expired. Please login again.",
           stack: "SessionState_from_stytch_data expired \n" + JSON.stringify(session),
@@ -133,10 +138,11 @@ export function SessionState_from_stytch_data(data: Record<string, any>, stytch_
     }
   } else {
     return {
-      session: {},
-      session_error: {
+      session: undefined,
+      invalid: true,
+      error: {
         name: "400",
-        message: "Authentication error. Please try again.",
+        message: "Session invalid. Please login again.",
         stack: "SessionState_from_stytch_data invalid \n" + JSON.stringify(session),
       },
     };

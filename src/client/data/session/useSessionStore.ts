@@ -10,26 +10,24 @@ import { persist } from "zustand/middleware";
 export type SessionStore = SessionState & {
   setState: (state: SessionState) => void;
   getState: () => SessionState;
-  setSession: (state: { session: SessionState["session"]; session_error?: SessionState["session_error"] }) => Promise<void>;
-  useSetSession: (session: SessionType) => void;
 };
 
 const sessionCreate = (set: (state: Partial<SessionState>) => void, get: () => SessionState) => {
   return {
-    setState: (state: SessionState) => {
-      set(state);
-    },
     getState: () => get(),
-    setSession: async ({ session, session_error }) => {
-      const session_invalid = !isSessionValid(session);
-      if (session_invalid && !session_error) {
-        session_error = { name: "Error", message: "Session invalid", stack: "useSessionStore.setSession()" };
+    setState: async (state: SessionState) => {
+      let invalid = !isSessionValid(state.session);
+      let error = state.error;
+      if (error) {
+        invalid = true;
+      } else if (invalid) {
+        error = { name: "500", message: "Session invalid", stack: "useSessionStore.setSessionState()" };
       }
-      set({ session: session, session_error, session_invalid });
+      set({ session: state.session, error, invalid });
     },
     session: sessionDefault,
-    session_invalid: false,
-    session_error: undefined,
+    invalid: true,
+    error: undefined,
   } as SessionStore;
 };
 
