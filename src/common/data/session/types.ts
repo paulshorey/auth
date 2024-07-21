@@ -1,8 +1,7 @@
-import { session_state_from_stytch_data, accountDefault } from "@/common/data/account/types";
+import { AccountType, accountDefault } from "@/common/data/account/types";
 
 export function isSessionValid(state: any): state is SessionState {
-  console.log("session3", state);
-  return state?.session?.id && state?.session?.user && state?.session?.expires_at && state?.session?.expires_on > Date.now() / 1000;
+  return !state?.session_error && state?.session?.id && state?.session?.user && state?.session?.expires_at && state?.session?.expires_on > Date.now() / 1000;
 }
 
 export const sessionDefault: SessionType = {
@@ -14,13 +13,13 @@ export const sessionDefault: SessionType = {
 };
 export const sessionStateDefault: SessionState = {
   session: sessionDefault,
-  session_valid: false,
+  session_invalid: true,
   session_error: undefined,
 };
 
 export type SessionType = {
   id: string;
-  user: session_state_from_stytch_data;
+  user: AccountType;
   expires_at: string;
   expires_on: number;
   provider: string;
@@ -28,8 +27,8 @@ export type SessionType = {
 
 export type SessionState = {
   session: SessionType | {};
-  session_valid?: boolean;
-  session_error?: Error;
+  session_invalid?: boolean;
+  session_error?: ErrorWithResponseCode;
 };
 
 export type StytchTokenType = "" | "magic_links" | "oauth" | "otp";

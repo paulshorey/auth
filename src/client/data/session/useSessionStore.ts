@@ -21,14 +21,14 @@ const sessionCreate = (set: (state: Partial<SessionState>) => void, get: () => S
     },
     getState: () => get(),
     setSession: async ({ session, session_error }) => {
-      const session_valid = isSessionValid(session);
-      if (session_valid && !session_error) {
+      const session_invalid = !isSessionValid(session);
+      if (session_invalid && !session_error) {
         session_error = { name: "Error", message: "Session invalid", stack: "useSessionStore.setSession()" };
       }
-      set({ session: session, session_error, session_valid });
+      set({ session: session, session_error, session_invalid });
     },
     session: sessionDefault,
-    session_valid: false,
+    session_invalid: false,
     session_error: undefined,
   } as SessionStore;
 };

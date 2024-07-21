@@ -1,5 +1,5 @@
-export function isAccountValid(account: any): account is session_state_from_stytch_data {
-  return !!account.email || !!account.phone_number;
+export function isAccountValid(account: any): account is AccountType {
+  return !!account?.email || !!account?.phone_number;
 }
 
 export const accountDefault = {
@@ -10,11 +10,11 @@ export const accountDefault = {
 };
 export const accountStateDefault: AccountState = {
   account: accountDefault,
-  account_valid: false,
+  account_invalid: true,
   account_error: undefined,
 };
 
-export type session_state_from_stytch_data = {
+export type AccountType = {
   xata_id?: string;
   email?: string;
   phone_number?: number;
@@ -23,7 +23,7 @@ export type session_state_from_stytch_data = {
 };
 
 export type AccountState = {
-  account: session_state_from_stytch_data;
-  account_valid?: boolean;
-  account_error?: Error;
+  account: AccountType;
+  account_invalid?: boolean;
+  account_error?: ErrorWithResponseCode;
 };

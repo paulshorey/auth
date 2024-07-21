@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { accountDefault, isAccountValid, AccountState, session_state_from_stytch_data } from "@/common/data/account/types";
+import { accountDefault, isAccountValid, AccountState, AccountType } from "@/common/data/account/types";
 import { persist } from "zustand/middleware";
 import { SessionState } from "@/common/data/session/types";
 import { SessionStore } from "@/client/data/session/useSessionStore";
@@ -13,15 +13,15 @@ export type AccountStore = AccountState & {
 const accountCreate = (set: (options: Partial<AccountState>) => void, get: () => AccountStore) => {
   return {
     account: accountDefault,
-    account_valid: false,
+    account_invalid: false,
     account_error: undefined,
     setAccount: async ({ account, account_error }) => {
-      const account_valid = isAccountValid(account);
-      if (account_valid && !account_error) {
+      const account_invalid = !isAccountValid(account);
+      if (account_invalid && !account_error) {
         account_error = { name: "Error", message: "Account invalid", stack: "useAccountStore.setAccount()" };
       }
-      set({ account: mergeAccounts(account, get().account), account_error, account_valid });
-      if (account_valid) {
+      set({ account: mergeAccounts(account, get().account), account_error, account_invalid });
+      if (account_invalid) {
         await fetch("/api/account", {
           method: "POST",
           body: JSON.stringify(account),
@@ -29,7 +29,7 @@ const accountCreate = (set: (options: Partial<AccountState>) => void, get: () =>
       }
     },
     resetAccount: () => {
-      set({ account: accountDefault, account_valid: false, account_error: undefined });
+      set({ account: accountDefault, account_invalid: false, account_error: undefined });
     },
   } as AccountStore;
 };
@@ -45,7 +45,7 @@ export const useAccountStore: (filter?: Filter) => AccountStore = create(
   })
 );
 
-function mergeAccounts(newAccount: Record<string, unknown>, oldAccount: Record<string, unknown>): session_state_from_stytch_data {
+function mergeAccounts(newAccount: Record<string, unknown>, oldAccount: Record<string, unknown>): AccountType {
   for (let key in oldAccount) {
     if (newAccount[key]) {
       oldAccount[key] = newAccount[key];
