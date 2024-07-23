@@ -1,33 +1,34 @@
-import { session_from_stytch_token } from "@/server/data/session";
-import { SessionState, StytchTokenType } from "@/common/data/session/types";
+import { sessionState_from_stytch_token } from "@/server/data/session";
+import { sessionStateType, stytchTokenType } from "@/common/data/session";
 import dynamic from "next/dynamic";
-import { handleStateError } from "@/common/data/errorHandling";
-import { account_get_or_add } from "@/server/data/account/index";
-import { AccountState } from "@/common/data/account/types";
-const Account = dynamic(() => import("@/client/pages/AccountFromServer"), { ssr: false });
+import { handleErrorWithResponseCode } from "@/common/utils/debug";
+import { accountState_get_or_add } from "@/server/data/account";
+import { accountStateType } from "@/common/data/account";
+
+const AccountSessionPageClient = dynamic(() => import("@/client/pages/AccountSession"), { ssr: false });
 
 type AccountPageProps = {
   params: {};
-  searchParams: { token: string; stytch_token_type: StytchTokenType };
+  searchParams: { token: string; stytch_token_type: stytchTokenType };
 };
 
-export default async function AccountPage({ searchParams }: AccountPageProps) {
-  let sessionState = {} as SessionState;
+export default async function AccountPageServer({ searchParams }: AccountPageProps) {
+  let sessionState = {} as sessionStateType;
   const { token, stytch_token_type } = searchParams;
 
-  // From token (redirected from OAuth provider)
+  // session from token (redirected from OAuth provider)
   if (token && stytch_token_type) {
-    sessionState = await session_from_stytch_token({ token, stytch_token_type });
+    sessionState = await sessionState_from_stytch_token({ token, stytch_token_type });
     if (sessionState.error) {
-      handleStateError(sessionState);
+      handleErrorWithResponseCode(sessionState.error);
     }
   }
 
   // fetch Account data
-  let accountState = {} as AccountState;
+  let accountState = {} as accountStateType;
   if (!sessionState.invalid && !sessionState.error && sessionState.session?.user) {
-    accountState = await account_get_or_add(sessionState.session.user);
+    accountState = await accountState_get_or_add(sessionState.session.user);
   }
 
-  return <Account accountState={accountState} sessionState={sessionState} />;
+  return <AccountSessionPageClient accountState={accountState} sessionState={sessionState} />;
 }

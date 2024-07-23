@@ -1,29 +1,16 @@
-export function isAccountValid(account: any): account is AccountType {
-  return !!account?.email || !!account?.phone_number;
-}
+import { ErrorWithResponseCode } from "../../utils";
 
-export const accountDefault = {
-  email: "",
-  phone_number: 0,
-  name_first: "",
-  name_last: "",
-};
-export const accountStateDefault: AccountState = {
-  account: accountDefault,
-  invalid: true,
-  error: undefined,
-};
-
-export type AccountType = {
-  xata_id?: string;
+export type accountType = {
+  id?: string;
   email?: string;
   phone_number?: number;
   name_first?: string;
   name_last?: string;
+  count?: number;
 };
 
-export type AccountState = {
-  account?: AccountType;
+export type accountStateType = {
+  account?: accountType;
   invalid?: boolean;
   error?: ErrorWithResponseCode;
 };

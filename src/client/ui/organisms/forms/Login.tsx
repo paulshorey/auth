@@ -1,6 +1,6 @@
 import { StytchLogin } from "@stytch/react";
 import { StytchLoginConfig } from "@stytch/core/dist/public";
-import { encodeJWT } from "@/common/data/encodeDecode";
+import { encodeJWT } from "@/common/utils/encode";
 
 export function LoginForm() {
   const protocol = window.location.protocol;
@@ -9,7 +9,7 @@ export function LoginForm() {
   const client = `${protocol}//${hostname}${port ? `:${port}` : ""}`;
   const config: StytchLoginConfig = {
     otpOptions: {
-      methods: ["sms"],
+      methods: ["email"],
       expirationMinutes: 10,
     },
     products: ["oauth", "otp"], // "emailMagicLinks",

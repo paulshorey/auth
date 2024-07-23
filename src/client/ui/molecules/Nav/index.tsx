@@ -9,7 +9,7 @@ export default function Nav(props: React.HTMLAttributes<HTMLDivElement>) {
             <Link href="/">Home</Link>
           </li>
           <li>
-            <Link href="/login">Login</Link>
+            <Link href="/login">Login / Signup</Link>
           </li>
           <li>
             <Link href="/account">Account</Link>

@@ -1,19 +1,20 @@
 import { create } from "zustand";
-import { accountDefault, isAccountValid, AccountState, AccountType } from "@/common/data/account/types";
+import { isAccountValid, accountStateType, accountType, accountStateDefault } from "@/common/data/account";
 import { persist } from "zustand/middleware";
+import { sessionStateType } from "@/common/data/session";
 // import { devtools } from "zustand/middleware";
 
-export type AccountStore = AccountState & {
-  setState: (state: AccountState) => Promise<void>;
-  resetAccount: () => void;
+type accountStoreType = accountStateType & {
+  getState: () => sessionStateType;
+  setState: (state: accountStateType) => Promise<void>;
+  resetState: () => void;
 };
 
-const accountCreate = (set: (options: Partial<AccountState>) => void, get: () => AccountStore) => {
+const accountStore = (set: (options: Partial<accountStateType>) => void, get: () => accountStoreType) => {
   return {
-    account: accountDefault,
-    invalid: true,
-    error: undefined,
-    setState: async (state: AccountState) => {
+    ...accountStateDefault,
+    getState: () => get(),
+    setState: async (state: accountStateType) => {
       const invalid = !isAccountValid(state.account);
       if (invalid && !state.error) {
         state.error = { name: "500", message: "Account invalid", stack: "useAccountStore.setAccount()" };
@@ -29,23 +30,23 @@ const accountCreate = (set: (options: Partial<AccountState>) => void, get: () =>
         });
       }
     },
-    resetAccount: () => {
-      set({ account: accountDefault, invalid: false, error: undefined });
+    resetState: () => {
+      set(accountStateDefault);
     },
-  } as AccountStore;
+  } as accountStoreType;
 };
 
-// export const useAccountStore = create<AccountStore>(accountState);
-type Filter = (arg0: AccountState) => any;
-const ENABLE_PERSIST_STATE = true;
-export const useAccountStore: (filter?: Filter) => AccountStore = create(
-  // persist state in localStorage
-  persist<AccountStore>(accountCreate, {
-    name: ENABLE_PERSIST_STATE ? "account/1" : Math.random().toString(),
-  })
-);
+export const useAccountStore: (filter?: (arg0: accountStateType) => any) => accountStoreType = process.env.NEXT_PUBLIC_STATE_ACCOUNT_CACHE_KEY
+  ? // persist state in localStorage
+    create(
+      persist<accountStoreType>(accountStore, {
+        name: process.env.NEXT_PUBLIC_STATE_ACCOUNT_CACHE_KEY,
+      })
+    )
+  : // do not persist
+    create<accountStoreType>(accountStore);
 
-function mergeAccounts(newAccount: Record<string, unknown>, oldAccount: Record<string, unknown>): AccountType {
+function mergeAccounts(newAccount: Record<string, unknown>, oldAccount: Record<string, unknown>): accountType {
   for (let key in oldAccount) {
     if (newAccount[key]) {
       oldAccount[key] = newAccount[key];
@@ -54,5 +55,5 @@ function mergeAccounts(newAccount: Record<string, unknown>, oldAccount: Record<s
     //   delete oldAccount[key];
     // }
   }
-  return oldAccount;
+  return oldAccount as accountType;
 }

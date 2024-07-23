@@ -1,24 +1,24 @@
-import { SessionState_from_stytch_data } from "@/server/data/session";
-import { isSessionValid, SessionState } from "@/common/data/session/types";
+import { sessionState_from_stytch_data } from "@/server/data/session";
+import { isSessionValid, sessionStateType } from "@/common/data/session";
 import dynamic from "next/dynamic";
-import { decodeJWT } from "@/common/data/encodeDecode";
-import { account_get_or_add } from "@/server/data/account/index";
-import { AccountState } from "../../../common/data/account/types";
-const Account = dynamic(() => import("@/client/pages/AccountFromServer"), { ssr: false });
+import { decodeJWT } from "@/common/utils/encode";
+import { accountState_get_or_add } from "@/server/data/account";
+import { accountStateType } from "@/common/data/account";
+const AccountSessionPageClient = dynamic(() => import("@/client/pages/AccountSession"), { ssr: false });
 
 type AccountPageProps = {
   params: {};
   searchParams: { data: string };
 };
 
-export default async function AccountPage({ searchParams }: AccountPageProps) {
-  let sessionState = {} as SessionState;
+export default async function AccountPageServer({ searchParams }: AccountPageProps) {
+  let sessionState = {} as sessionStateType;
   const { data } = searchParams;
 
   // From phone/email OTP event (redirected from client-side login page)
   if (data) {
-    const otpEventData = decodeJWT(data) as SessionState;
-    sessionState = SessionState_from_stytch_data(otpEventData, "otp");
+    const otpEventData = decodeJWT(data) as sessionStateType;
+    sessionState = sessionState_from_stytch_data(otpEventData, "otp");
     if (!sessionState.error) {
       if (!isSessionValid(sessionState.session)) {
         sessionState.invalid = true;
@@ -28,10 +28,10 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
   }
 
   // fetch Account data
-  let accountState = {} as AccountState;
+  let accountState = {} as accountStateType;
   if (!sessionState.invalid && !sessionState.error && sessionState.session?.user) {
-    accountState = await account_get_or_add(sessionState.session.user);
+    accountState = await accountState_get_or_add(sessionState.session.user);
   }
 
-  return <Account accountState={accountState} sessionState={sessionState} />;
+  return <AccountSessionPageClient accountState={accountState} sessionState={sessionState} />;
 }

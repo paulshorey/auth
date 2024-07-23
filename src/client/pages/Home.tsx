@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Layout1 } from "@/client/ui/templates/Layout1";
 
-export default function HomePage() {
+export default function HomePageClient() {
   const [count, setCount] = useState(0);
   return (
     <Layout1>

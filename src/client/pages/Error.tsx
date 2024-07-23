@@ -8,7 +8,7 @@ type Props = {
   data?: any;
 };
 
-export default function ErrorPage({ title, data }: Props) {
+export default function ErrorPageClient({ title, data }: Props) {
   const pathname = usePathname();
   const urlParams = new URLSearchParams(window.location.search);
   const urlData = urlParams.entries();

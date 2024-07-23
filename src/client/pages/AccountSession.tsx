@@ -1,21 +1,21 @@
 "use client";
 
 import { Layout1 } from "@/client/ui/templates/Layout1";
-import { SessionState, StytchTokenType } from "@/common/data/session/types";
-import { useSessionStore } from "@/client/data/session/useSessionStore";
-import { useAccountStore } from "../data/account/useAccountStore";
-import { AccountState } from "../../common/data/account/types";
+import { sessionStateType, stytchTokenType } from "@/common/data/session";
+import { useSessionStore } from "@/client/data/session";
+import { useAccountStore } from "../data/account";
+import { accountStateType } from "../../common/data/account";
 import { useEffect } from "react";
-import { redirectNextjs } from "../../common/data/errorHandling";
+import { redirectNextjs } from "@/common/utils/route";
 
 type Props = {
-  accountState?: AccountState;
-  sessionState?: SessionState;
+  accountState?: accountStateType;
+  sessionState?: sessionStateType;
   token?: string;
-  stytch_token_type?: StytchTokenType;
+  stytch_token_type?: stytchTokenType;
 };
 
-export default function AccountFromServer({ sessionState: sessionStateFromServer, accountState: accountStateFromServer }: Props) {
+export default function AccountSessionPageClient({ sessionState: sessionStateFromServer, accountState: accountStateFromServer }: Props) {
   const sessionState = useSessionStore();
   const accountState = useAccountStore();
 

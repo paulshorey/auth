@@ -1,13 +1,12 @@
-import { SessionType, isSessionValid, StytchTokenType, SessionState } from "@/common/data/session/types";
-import { convertErrorOrResponseToObject } from "@/common/debugging";
+import { sessionType, isSessionValid, stytchTokenType, sessionStateType } from "@/common/data/session";
+import { convertErrorOrResponseToObject } from "@/common/utils";
 
 type Props = {
   token: string;
-  stytch_token_type: StytchTokenType;
+  stytch_token_type: stytchTokenType;
 };
 
-export async function session_from_stytch_token({ token, stytch_token_type }: Props): Promise<SessionState> {
-  console.log("session_from_stytch_token", { token, stytch_token_type });
+export async function sessionState_from_stytch_token({ token, stytch_token_type }: Props): Promise<sessionStateType> {
   if (!token || !stytch_token_type) {
     return {
       session: undefined,
@@ -21,12 +20,12 @@ export async function session_from_stytch_token({ token, stytch_token_type }: Pr
   }
   try {
     // Basic auth credentials
-    const username = "project-test-11bc6ab9-6fd7-41c1-8785-bf4452a33808";
-    const password = "secret-test-mICr-g4hvThQ-dhzvji2bZMV4aUoNxoOoAA=";
+    const username = process.env.STYTCH_USERNAME;
+    const password = process.env.STYTCH_PASSWORD;
     const base64Credentials = Buffer.from(`${username}:${password}`).toString("base64");
 
     // Verify the token with Stytch using fetch API
-    const url = "https://test.stytch.com/v1/" + stytch_token_type + "/authenticate";
+    const url = process.env.STYTCH_BASEPATH + "/" + stytch_token_type + "/authenticate";
     const stytchResponse = await fetch(url, {
       method: "POST",
       headers: {
@@ -51,24 +50,23 @@ export async function session_from_stytch_token({ token, stytch_token_type }: Pr
       };
     }
 
-    return SessionState_from_stytch_data(await stytchResponse.json(), stytch_token_type);
+    return sessionState_from_stytch_data(await stytchResponse.json(), stytch_token_type);
 
     // error
   } catch (error) {
-    console.log("session_from_stytch_token catch", { token, stytch_token_type });
     return {
       session: undefined,
       invalid: true,
       error: {
         name: "400",
         message: "Authentication error. Please try again.",
-        stack: "session_from_stytch_token catch error \n" + JSON.stringify({ token, stytch_token_type }),
+        stack: "sessionState_from_stytch_token catch error. \nProps: " + JSON.stringify({ token, stytch_token_type }),
       },
     };
   }
 }
 
-export function SessionState_from_stytch_data(data: Record<string, any>, stytch_token_type: StytchTokenType): SessionState {
+export function sessionState_from_stytch_data(data: Record<string, any>, stytch_token_type: stytchTokenType): sessionStateType {
   // common
   let phone = parseInt(data.user.phone_numbers?.[0]?.phone_number?.replace(/[^\d]+/g, "") || "0");
   let email = data.user.emails?.[0]?.email || "";
@@ -82,7 +80,7 @@ export function SessionState_from_stytch_data(data: Record<string, any>, stytch_
     },
     expires_at: "",
     expires_on: 0,
-  } as SessionType;
+  } as sessionType;
 
   // unique
   try {
@@ -116,7 +114,7 @@ export function SessionState_from_stytch_data(data: Record<string, any>, stytch_
       error: {
         name: "400",
         message: "Authentication error. Please try again.",
-        stack: "SessionState_from_stytch_data catch \n" + JSON.stringify(error),
+        stack: "sessionState_from_stytch_data catch \n" + JSON.stringify(error),
       },
     };
   }
@@ -132,7 +130,7 @@ export function SessionState_from_stytch_data(data: Record<string, any>, stytch_
         error: {
           name: "400",
           message: "Session expired. Please login again.",
-          stack: "SessionState_from_stytch_data expired \n" + JSON.stringify(session),
+          stack: "sessionState_from_stytch_data expired \n" + JSON.stringify(session),
         },
       };
     }
@@ -143,7 +141,7 @@ export function SessionState_from_stytch_data(data: Record<string, any>, stytch_
       error: {
         name: "400",
         message: "Session invalid. Please login again.",
-        stack: "SessionState_from_stytch_data invalid \n" + JSON.stringify(session),
+        stack: "sessionState_from_stytch_data invalid \n" + JSON.stringify(session),
       },
     };
   }

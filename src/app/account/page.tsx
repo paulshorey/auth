@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
-const Account = dynamic(() => import("@/client/pages/Account"), { ssr: false });
+const AccountPageClient = dynamic(() => import("@/client/pages/Account"), { ssr: false });
 
-export default async function AccountPage() {
-  return <Account />;
+export default async function AccountPageServer() {
+  return <AccountPageClient />;
 }

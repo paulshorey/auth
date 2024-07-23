@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { sessionDefault, SessionState, isSessionValid, SessionType } from "@/common/data/session/types";
+import { sessionStateType, isSessionValid, sessionStateDefault } from "@/common/data/session";
 import { persist } from "zustand/middleware";
 // import { devtools } from "zustand/middleware";
 
@@ -7,48 +7,40 @@ import { persist } from "zustand/middleware";
  * "state" = just the data, serializable, can persist in localStorage if we want
  * "store" = state + plus methods that modify the state
  */
-export type SessionStore = SessionState & {
-  setState: (state: SessionState) => void;
-  getState: () => SessionState;
+type sessionStoreType = sessionStateType & {
+  getState: () => sessionStateType;
+  setState: (state: sessionStateType) => void;
+  resetState: () => void;
 };
 
-const sessionCreate = (set: (state: Partial<SessionState>) => void, get: () => SessionState) => {
+const sessionCreate = (set: (state: Partial<sessionStateType>) => void, get: () => sessionStateType) => {
+  if (typeof window !== "undefined") {
+  }
   return {
+    ...sessionStateDefault,
     getState: () => get(),
-    setState: async (state: SessionState) => {
+    setState: async (state: sessionStateType) => {
       let invalid = !isSessionValid(state.session);
       let error = state.error;
       if (error) {
         invalid = true;
       } else if (invalid) {
-        error = { name: "500", message: "Session invalid", stack: "useSessionStore.setSessionState()" };
+        error = { name: "500", message: "Session invalid", stack: "useSessionStore.setsessionStateType()" };
       }
-      set({ session: state.session, error, invalid });
+      set({ ...state, error, invalid });
     },
-    session: sessionDefault,
-    invalid: true,
-    error: undefined,
-  } as SessionStore;
+    resetState: () => {
+      set(sessionStateDefault);
+    },
+  } as sessionStoreType;
 };
 
-type Filter = (arg0: SessionState) => any;
-const ENABLE_PERSIST_STATE = true;
-export const useSessionStore: (filter?: Filter) => SessionStore = create(
-  // persist state in localStorage
-  persist<SessionStore>(sessionCreate, {
-    name: ENABLE_PERSIST_STATE ? "session/1" : Math.random().toString(),
-  })
-);
-
-// export const useAccountStore = () => {
-//   const store = createStore((state) => state);
-//   const account = store.account;
-//   useEffect(() => {
-//     // @ts-ignore
-//     window.accountStore = store;
-//     // @ts-ignore
-//     console.log("accountStore", window.accountStore);
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, [account]);
-//   return store;
-// };
+export const useSessionStore: (filter?: (arg0: sessionStateType) => any) => sessionStoreType = process.env.NEXT_PUBLIC_STATE_SESSION_CACHE_KEY
+  ? // persist state in localStorage
+    create(
+      persist<sessionStoreType>(sessionCreate, {
+        name: process.env.NEXT_PUBLIC_STATE_SESSION_CACHE_KEY,
+      })
+    )
+  : // do not persist
+    create<sessionStoreType>(sessionCreate);
